@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <Description>This library provides methods for encoding and decoding base64url (RFC 4648) data using the new memory efficient Span and Buffer APIs.</Description>
+    <PackageTags>Base64;Base64Url;RFC 4648</PackageTags>
+  </PropertyGroup>
+
+</Project>
