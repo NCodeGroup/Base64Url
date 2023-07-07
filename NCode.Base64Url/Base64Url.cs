@@ -64,11 +64,23 @@ public static class Base64Url
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static (int Quotient, int Remainder) MathDivRem(int left, int right)
+    {
+#if NET6_0
+        return Math.DivRem(left, right);
+#else
+        var quotient = left / right;
+        return (quotient, left - (quotient * right));
+#endif
+    }
+
     /// <summary>
     /// Calculates the number of characters produced by encoding the specified number of bytes.
     /// </summary>
     /// <param name="byteCount">The number of bytes to encode.</param>
     /// <returns>The number of characters produced by encoding the specified number of bytes.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetCharCountForEncode(int byteCount)
     {
         return (byteCount * CharBlockSize + MaxPadCount) / ByteBlockSize;
@@ -198,11 +210,13 @@ public static class Base64Url
     /// </summary>
     /// <param name="charCount">The number of characters to decode.</param>
     /// <returns>The number of bytes produced by decoding the specified number of characters.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetByteCountForDecode(int charCount)
     {
         return GetByteCountForDecode(charCount, out _);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetByteCountForDecode(int charCount, out int remainder)
     {
         if (charCount == 0)
@@ -211,7 +225,7 @@ public static class Base64Url
             return 0;
         }
 
-        var (byteCount, tempRemainder) = Math.DivRem(charCount * ByteBlockSize, CharBlockSize);
+        var (byteCount, tempRemainder) = MathDivRem(charCount * ByteBlockSize, CharBlockSize);
         if (tempRemainder > MaxPadCount)
             throw new FormatException("Invalid length for a Base64Url char array or string.");
 
