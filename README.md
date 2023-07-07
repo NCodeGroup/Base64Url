@@ -1,4 +1,4 @@
-![example workflow](https://github.com/NCodeGroup/Base64Url/actions/workflows/dotnet.yml/badge.svg)
+![automated build and test](https://github.com/NCodeGroup/Base64Url/actions/workflows/main.yml/badge.svg)
 
 # Overview
 
