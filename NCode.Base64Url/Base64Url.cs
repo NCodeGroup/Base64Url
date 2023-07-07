@@ -246,7 +246,6 @@ public static class Base64Url
     /// <returns>The number of bytes written to <paramref name="writer"/>.</returns>
     public static int Decode(ReadOnlySpan<char> chars, IBufferWriter<byte> writer)
     {
-        // TODO: unit tests
         if (chars.Length == 0) return 0;
 
         var minDestLength = GetByteCountForDecode(chars.Length, out var remainder);
@@ -267,7 +266,6 @@ public static class Base64Url
     /// <returns><c>true</c> if the operation succeeded; otherwise, <c>false</c> if the destination is too small.</returns>
     public static bool TryDecode(ReadOnlySpan<char> chars, Span<byte> bytes, out int bytesWritten)
     {
-        // TODO: unit tests
         if (chars.Length == 0)
         {
             bytesWritten = 0;

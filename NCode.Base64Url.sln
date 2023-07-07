@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCode.Base64Url", "NCode.Base64Url\NCode.Base64Url.csproj", "{008E616F-A200-4F2C-A262-84626AE2D1F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCode.Base64Url.Tests", "NCode.Base64Url.Tests\NCode.Base64Url.Tests.csproj", "{5A9670AC-D5DC-471F-9A06-9E76681EF0BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{008E616F-A200-4F2C-A262-84626AE2D1F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{008E616F-A200-4F2C-A262-84626AE2D1F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{008E616F-A200-4F2C-A262-84626AE2D1F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A9670AC-D5DC-471F-9A06-9E76681EF0BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A9670AC-D5DC-471F-9A06-9E76681EF0BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A9670AC-D5DC-471F-9A06-9E76681EF0BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A9670AC-D5DC-471F-9A06-9E76681EF0BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
