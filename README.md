@@ -1,3 +1,5 @@
+![example workflow](https://github.com/NCodeGroup/Base64Url/actions/workflows/dotnet.yml/badge.svg)
+
 # Overview
 
 This library provides methods for encoding and decoding `base64url` ([RFC 4648]) data using the new memory
