@@ -30,12 +30,11 @@ jobs:
       id: extract_version
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build for CI
-      if: steps.extract_version.outputs.is-semver != 'true'
-      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION}
-    - name: Build for CD
+    - name: Build
       if: steps.extract_version.outputs.is-semver == 'true'
-      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${{ steps.extract_version.outputs.version-without-v }}"
+      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${BUILD_VERSION}"
+      env:
+        BUILD_VERSION: ${{ steps.extract_version.outputs.is-semver == 'true' && steps.extract_version.outputs.version-without-v || '0.0.0' }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -65,7 +64,7 @@ jobs:
         run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION}
 
   publish:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.tag_name
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -75,7 +74,7 @@ jobs:
         with:
           name: binaries
       - name: Upload release artifacts
-        run: gh release upload ${GITHUB_REF} ./*/bin/${BUILD_CONFIGURATION}/*.nupkg ./*/bin/${BUILD_CONFIGURATION}/*.snupkg
+        run: gh release upload ${{ github.event.release.tag_name }} ./*/bin/${BUILD_CONFIGURATION}/*.nupkg ./*/bin/${BUILD_CONFIGURATION}/*.snupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup .NET
