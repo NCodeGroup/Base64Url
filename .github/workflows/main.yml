@@ -30,10 +30,10 @@ jobs:
       id: extract_version
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build for CI
       if: steps.extract_version.outputs.is-semver != 'true'
       run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION}
-    - name: Build
+    - name: Build for CD
       if: steps.extract_version.outputs.is-semver == 'true'
       run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${{ steps.extract_version.outputs.version-without-v }}"
     - name: Upload artifacts
