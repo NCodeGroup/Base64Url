@@ -75,6 +75,8 @@ jobs:
           name: binaries
       - name: Upload release artifacts
         run: gh release upload ${GITHUB_REF} ./*/bin/${BUILD_CONFIGURATION}/*.nupkg ./*/bin/${BUILD_CONFIGURATION}/*.snupkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
