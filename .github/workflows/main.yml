@@ -31,7 +31,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      if: steps.extract_version.outputs.is-semver == 'true'
       run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${BUILD_VERSION}"
       env:
         BUILD_VERSION: ${{ steps.extract_version.outputs.is-semver == 'true' && steps.extract_version.outputs.version-without-v || '0.0.0' }}
