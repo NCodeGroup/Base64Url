@@ -31,6 +31,10 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
+      if: steps.extract_version.outputs.is-semver != 'true'
+      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION}
+    - name: Build
+      if: steps.extract_version.outputs.is-semver == 'true'
       run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${{ steps.extract_version.outputs.version-without-v }}"
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
