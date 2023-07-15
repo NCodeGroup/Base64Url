@@ -2,18 +2,19 @@
 <Project>
   <PropertyGroup>
 
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
+    <DocumentationFile Condition="'$(DocumentationFile)' == ''">bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
 
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
 
-    <VersionCore>0.0.1</VersionCore>
-    <PreRelease>alpha</PreRelease>
+    <!--
+        <VersionCore>0.0.1</VersionCore>
 
-    <Version Condition="'$(PreRelease)' == ''">$(VersionCore)</Version>
-    <Version Condition="'$(PreRelease)' != ''">$(VersionCore)-$(PreRelease)</Version>
+        <Version Condition="'$(PreRelease)' == ''">$(VersionCore)</Version>
+        <Version Condition="'$(PreRelease)' != ''">$(VersionCore)-$(PreRelease)</Version>
 
-    <FileVersion>$(VersionCore)</FileVersion>
-    <AssemblyVersion>$(VersionCore)</AssemblyVersion>
+        <FileVersion>$(VersionCore)</FileVersion>
+        <AssemblyVersion>$(VersionCore)</AssemblyVersion>
+    -->
 
   </PropertyGroup>
 </Project>
