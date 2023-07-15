@@ -3,10 +3,13 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  release:
+    types: ["published"]
 
 env:
   BUILD_CONFIGURATION: Release
@@ -14,25 +17,22 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-
-    - name: Restore Dependencies
+    - name: Extract version from tag
+      uses: battila7/get-version-action@v2
+      id: extract_version
+    - name: Restore dependencies
       run: dotnet restore
-
     - name: Build
-      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION}
-
-    - name: Upload Artifacts
+      run: dotnet build --no-restore --configuration ${BUILD_CONFIGURATION} /p:Version="${{ steps.extract_version.outputs.version-without-v }}"
+    - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: binaries
@@ -45,22 +45,35 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Run rests
+        run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION}
 
-      - name: Download Artifacts
+  publish:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
           name: binaries
-
-      - name: Restore Dependencies
-        run: dotnet restore
-
-      - name: Run Tests
-        run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION}
+      - name: Upload release artifacts
+        run: gh release upload ${GITHUB_REF} ./*/bin/${BUILD_CONFIGURATION}/*.nupkg ./*/bin/${BUILD_CONFIGURATION}/*.snupkg
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Publish NuGet package
+        run: dotnet nuget push ./*/bin/${BUILD_CONFIGURATION}/*.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json
