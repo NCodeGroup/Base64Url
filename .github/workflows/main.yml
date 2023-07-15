@@ -36,8 +36,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: binaries
-        path: ./*/bin/*
+        path: |
+          ./*/bin/*
+          ./*/obj/*
         if-no-files-found: error
+        retention-days: 5
 
   test:
     needs: [build]
