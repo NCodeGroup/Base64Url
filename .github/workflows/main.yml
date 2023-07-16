@@ -60,7 +60,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Run rests
-        run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION}
+        run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION} --logger trx
+      - name: Unit Tests
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: Unit Tests
+          path: ./*/TestResults/*.trx
+          reporter: dotnet-trx
 
   publish:
     if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.tag_name
