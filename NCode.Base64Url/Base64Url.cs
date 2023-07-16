@@ -1,4 +1,5 @@
 ﻿#region Copyright Preamble
+
 //
 //    Copyright @ 2023 NCode Group
 //
@@ -13,6 +14,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
+
 #endregion
 
 using System.Buffers;
@@ -176,8 +178,7 @@ public static class Base64Url
             {
                 chars[charPos] = (char)map[(bytes[bytePos] & 0xFC) >> 2];
                 chars[charPos + 1] = (char)map[((bytes[bytePos] & 0x03) << 4) | ((bytes[bytePos + 1] & 0xF0) >> 4)];
-                chars[charPos + 2] =
-                    (char)map[((bytes[bytePos + 1] & 0x0F) << 2) | ((bytes[bytePos + 2] & 0xC0) >> 6)];
+                chars[charPos + 2] = (char)map[((bytes[bytePos + 1] & 0x0F) << 2) | ((bytes[bytePos + 2] & 0xC0) >> 6)];
                 chars[charPos + 3] = (char)map[bytes[bytePos + 2] & 0x3F];
                 charPos += CharBlockSize;
             }
@@ -192,8 +193,7 @@ public static class Base64Url
 
                 case 2: // one character padding omitted
                     chars[charPos] = (char)map[(bytes[bytePos] & 0xFC) >> 2];
-                    chars[charPos + 1] =
-                        (char)map[((bytes[bytePos] & 0x03) << 4) | ((bytes[bytePos + 1] & 0xF0) >> 4)];
+                    chars[charPos + 1] = (char)map[((bytes[bytePos] & 0x03) << 4) | ((bytes[bytePos + 1] & 0xF0) >> 4)];
                     chars[charPos + 2] = (char)map[(bytes[bytePos + 1] & 0x0F) << 2];
                     charPos += 3;
                     break;
