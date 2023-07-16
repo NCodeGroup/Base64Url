@@ -61,11 +61,11 @@ jobs:
         run: dotnet restore
       - name: Run rests
         run: dotnet test --no-build --verbosity normal --configuration ${BUILD_CONFIGURATION} --logger trx
-      - name: Unit Tests
+      - name: Publish tests
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: Unit Tests
+          name: tests
           path: ./*/TestResults/*.trx
           reporter: dotnet-trx
 
