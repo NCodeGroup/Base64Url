@@ -4,17 +4,5 @@
 
     <DocumentationFile Condition="'$(DocumentationFile)' == ''">bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
 
-    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-
-    <!--
-        <VersionCore>0.0.1</VersionCore>
-
-        <Version Condition="'$(PreRelease)' == ''">$(VersionCore)</Version>
-        <Version Condition="'$(PreRelease)' != ''">$(VersionCore)-$(PreRelease)</Version>
-
-        <FileVersion>$(VersionCore)</FileVersion>
-        <AssemblyVersion>$(VersionCore)</AssemblyVersion>
-    -->
-
   </PropertyGroup>
 </Project>
