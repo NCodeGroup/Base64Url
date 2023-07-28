@@ -1,18 +1,20 @@
 #region Copyright Preamble
-// 
+
+//
 //    Copyright @ 2023 NCode Group
-// 
+//
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
-// 
+//
 //        http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //    Unless required by applicable law or agreed to in writing, software
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
+
 #endregion
 
 using System.Buffers;
@@ -72,18 +74,54 @@ public class Base64UrlTests
     [InlineData(1024)]
     [InlineData(2048)]
     [InlineData(4096)]
+    [InlineData(8192)]
     public void Encode_WhenUsingBufferWriter(int byteCount)
     {
         Span<byte> inputBytes = new byte[byteCount];
         RandomNumberGenerator.Fill(inputBytes);
 
-        using var charBuffer = new Sequence<char>();
+        using var charBuffer = new Sequence<char>(ArrayPool<char>.Shared);
 
         var charsWritten = Base64Url.Encode(inputBytes, charBuffer);
         Assert.Equal(charBuffer.Length, charsWritten);
 
         var actual = charBuffer.AsReadOnlySequence.ToString();
         AssertBase64Url(inputBytes, actual);
+    }
+
+    [Theory]
+    [InlineData(3, 3, 3)]
+    [InlineData(2, 4, 0)]
+    [InlineData(2, 3, 1)]
+    [InlineData(0, 1, 2)]
+    [InlineData(1, 1, 0)]
+    [InlineData(2, 2, 1)]
+    [InlineData(3, 4, 5)]
+    [InlineData(6, 7, 8)]
+    public void Encode_WhenUsingSequence(int byteCount1, int byteCount2, int byteCount3)
+    {
+        var inputBytes1 = new byte[byteCount1];
+        RandomNumberGenerator.Fill(inputBytes1);
+        var segment1 = new MemorySegment<byte>(inputBytes1);
+
+        var inputBytes2 = new byte[byteCount2];
+        RandomNumberGenerator.Fill(inputBytes2);
+        var segment2 = segment1.Append(inputBytes2);
+
+        var inputBytes3 = new byte[byteCount3];
+        RandomNumberGenerator.Fill(inputBytes3);
+        var segment3 = segment2.Append(inputBytes3);
+
+        var inBuffer = new ReadOnlySequence<byte>(segment1, 0, segment3, inputBytes3.Length);
+        var inSpan = inBuffer.ToArray().AsSpan();
+        var expected = ToBase64UrlSlow(inSpan);
+
+        using var outBuffer = new Sequence<char>(ArrayPool<char>.Shared);
+
+        var charsWritten = Base64Url.Encode(inBuffer, outBuffer);
+        Assert.Equal(expected.Length, charsWritten);
+        Assert.Equal(expected.Length, outBuffer.Length);
+        Assert.Equal(expected, outBuffer.AsReadOnlySequence.ToString());
     }
 
     [Fact]
@@ -205,6 +243,40 @@ public class Base64UrlTests
         Assert.Equal(byteBuffer.Length, bytesWritten);
 
         Assert.True(inputBytes.SequenceEqual(byteBuffer.AsReadOnlySequence.ToArray()));
+    }
+
+    [Theory]
+    [InlineData(3, 3, 4)]
+    [InlineData(2, 4, 0)]
+    [InlineData(2, 3, 1)]
+    [InlineData(0, 1, 2)]
+    [InlineData(1, 1, 0)]
+    [InlineData(2, 2, 2)]
+    [InlineData(3, 4, 5)]
+    public void Decode_WhenUsingSequence(int charCount1, int charCount2, int charCount3)
+    {
+        var totalCharCount = charCount1 + charCount2 + charCount3;
+        var totalByteCount = Base64Url.GetByteCountForDecode(totalCharCount);
+
+        Span<byte> totalByteBuffer = new byte[totalByteCount];
+        RandomNumberGenerator.Fill(totalByteBuffer);
+        var totalCharBuffer = ToBase64UrlSlow(totalByteBuffer).AsMemory();
+
+        var inputChars1 = totalCharBuffer[..charCount1];
+        var inputChars2 = totalCharBuffer.Slice(charCount1, charCount2);
+        var inputChars3 = totalCharBuffer.Slice(charCount1 + charCount2, charCount3);
+
+        var segment1 = new MemorySegment<char>(inputChars1);
+        var segment2 = segment1.Append(inputChars2);
+        var segment3 = segment2.Append(inputChars3);
+
+        var inBuffer = new ReadOnlySequence<char>(segment1, 0, segment3, charCount3);
+        using var outBuffer = new Sequence<byte>(ArrayPool<byte>.Shared);
+
+        var bytesWritten = Base64Url.Decode(inBuffer, outBuffer);
+        Assert.Equal(totalByteCount, bytesWritten);
+        Assert.Equal(totalByteCount, outBuffer.Length);
+        Assert.Equal(totalByteBuffer.ToArray(), outBuffer.AsReadOnlySequence.ToArray());
     }
 
     [Fact]

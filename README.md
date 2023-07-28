@@ -20,34 +20,47 @@ public static class Base64Url
 
     public static int GetCharCountForEncode(
         int byteCount);
-    
+
     public static string Encode(
         ReadOnlySpan<byte> bytes);
-    
+
     public static int Encode(
         ReadOnlySpan<byte> bytes,
         IBufferWriter<char> writer);
-    
+
+    public static int Encode(
+        ReadOnlySequence<byte> sequence,
+        IBufferWriter<char> writer)
+
     public static bool TryEncode(
         ReadOnlySpan<byte> bytes,
         Span<char> chars,
         out int charsWritten);
-    
+
     // Decode...
-    
+
     public static int GetByteCountForDecode(
         int charCount);
-    
+
     public static byte[] Decode(
         ReadOnlySpan<char> chars);
-    
+
     public static int Decode(
         ReadOnlySpan<char> chars,
         IBufferWriter<byte> writer);
-    
+
+    public static int Decode(
+        ReadOnlySequence<char> sequence,
+        IBufferWriter<byte> writer);
+
     public static bool TryDecode(
         ReadOnlySpan<char> chars,
         Span<byte> bytes,
         out int bytesWritten);
 }
 ```
+
+## Release Notes
+
+* v1.0.0 - Initial release
+* v1.1.0 - Added support for sequences
