@@ -1,4 +1,4 @@
-![automated build and test](https://github.com/NCodeGroup/Base64Url/actions/workflows/main.yml/badge.svg)
+[![ci](https://github.com/NCodeGroup/Base64Url/actions/workflows/main.yml/badge.svg)](https://github.com/NCodeGroup/Base64Url/actions)
 
 # Overview
 
