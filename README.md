@@ -30,7 +30,7 @@ public static class Base64Url
 
     public static int Encode(
         ReadOnlySequence<byte> sequence,
-        IBufferWriter<char> writer)
+        IBufferWriter<char> writer);
 
     public static bool TryEncode(
         ReadOnlySpan<byte> bytes,
