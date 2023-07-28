@@ -158,10 +158,11 @@ public static class Base64Url
                 {
                     span[..need].CopyTo(scratch[scratchPos..]);
                     totalCharsWritten += Encode(scratch, writer);
-                    scratchPos = 0;
 
                     span = span[need..];
                     spanLen = span.Length;
+
+                    scratchPos = 0;
                 }
                 else
                 {
@@ -457,10 +458,11 @@ public static class Base64Url
                 {
                     span[..need].CopyTo(scratch[scratchPos..]);
                     totalBytesWritten += Decode(scratch, writer);
-                    scratchPos = 0;
 
                     span = span[need..];
                     spanLen = span.Length;
+
+                    scratchPos = 0;
                 }
                 else
                 {
