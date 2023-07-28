@@ -33,6 +33,11 @@ public static class Base64Url
         IBufferWriter<char> writer);
 
     public static bool TryEncode(
+        ReadOnlySequence<byte> sequence,
+        Span<char> chars,
+        out int charsWritten);
+
+    public static bool TryEncode(
         ReadOnlySpan<byte> bytes,
         Span<char> chars,
         out int charsWritten);
@@ -54,6 +59,11 @@ public static class Base64Url
         IBufferWriter<byte> writer);
 
     public static bool TryDecode(
+        ReadOnlySequence<char> sequence,
+        Span<byte> bytes,
+        out int bytesWritten);
+
+    public static bool TryDecode(
         ReadOnlySpan<char> chars,
         Span<byte> bytes,
         out int bytesWritten);
@@ -64,3 +74,4 @@ public static class Base64Url
 
 * v1.0.0 - Initial release
 * v1.1.0 - Added support for sequences
+* v1.1.1 - Added support for sequences without buffer writer

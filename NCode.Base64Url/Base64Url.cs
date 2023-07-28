@@ -200,6 +200,102 @@ public static class Base64Url
     }
 
     /// <summary>
+    /// Encodes the sequence of binary data into UTF-8 encoded text represented as base64url.
+    /// </summary>
+    /// <param name="sequence">The input sequence that contains the binary data that needs to be encoded.</param>
+    /// <param name="chars">Destination for the encoded base64url text.</param>
+    /// <param name="charsWritten">When this method returns, contains a value that indicates the number of characters written to <paramref name="chars"/>.</param>
+    /// <returns><c>true</c> if the operation succeeded; otherwise, <c>false</c> if the destination is too small.</returns>
+    public static bool TryEncode(ReadOnlySequence<byte> sequence, Span<char> chars, out int charsWritten)
+    {
+        var byteCount = (int)sequence.Length;
+        if (byteCount == 0)
+        {
+            charsWritten = 0;
+            return true;
+        }
+
+        var minCharCount = GetCharCountForEncode(byteCount);
+        if (chars.Length < minCharCount)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        Span<byte> scratch = stackalloc byte[ByteBlockSize];
+        var scratchPos = 0;
+
+        var totalCharsWritten = 0;
+        foreach (var segment in sequence)
+        {
+            var span = segment.Span;
+            var spanLen = span.Length;
+            if (scratchPos > 0)
+            {
+                var need = ByteBlockSize - scratchPos;
+                if (need <= spanLen)
+                {
+                    span[..need].CopyTo(scratch[scratchPos..]);
+                    var result = TryEncode(scratch, chars, out var localCharsWritten);
+                    Debug.Assert(result && localCharsWritten == CharBlockSize);
+
+                    chars = chars[localCharsWritten..];
+                    totalCharsWritten += localCharsWritten;
+
+                    span = span[need..];
+                    spanLen = span.Length;
+
+                    scratchPos = 0;
+                }
+                else
+                {
+                    span.CopyTo(scratch[scratchPos..]);
+                    scratchPos += spanLen;
+
+                    span = Span<byte>.Empty;
+                    spanLen = 0;
+                }
+            }
+
+            if (spanLen == 0)
+                continue;
+
+            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, ByteBlockSize);
+            if (spanRemainder == 0)
+            {
+                var result = TryEncode(span, chars, out var localCharsWritten);
+                Debug.Assert(result);
+
+                chars = chars[localCharsWritten..];
+                totalCharsWritten += localCharsWritten;
+            }
+            else
+            {
+                var wholeLen = spanQuotient * ByteBlockSize;
+                var result = TryEncode(span[..wholeLen], chars, out var localCharsWritten);
+                Debug.Assert(result);
+
+                chars = chars[localCharsWritten..];
+                totalCharsWritten += localCharsWritten;
+
+                span[wholeLen..].CopyTo(scratch[scratchPos..]);
+                scratchPos += spanRemainder;
+            }
+        }
+
+        if (scratchPos > 0)
+        {
+            var result = TryEncode(scratch[..scratchPos], chars, out var localCharsWritten);
+            Debug.Assert(result);
+
+            totalCharsWritten += localCharsWritten;
+        }
+
+        charsWritten = totalCharsWritten;
+        return true;
+    }
+
+    /// <summary>
     /// Encodes the span of binary data into UTF-8 encoded text represented as base64url.
     /// </summary>
     /// <param name="bytes">The input span that contains the binary data that needs to be encoded.</param>
@@ -215,7 +311,7 @@ public static class Base64Url
             return true;
         }
 
-        var minCharCount = GetCharCountForEncode(bytes.Length);
+        var minCharCount = GetCharCountForEncode(byteCount);
         if (chars.Length < minCharCount)
         {
             charsWritten = 0;
@@ -400,6 +496,103 @@ public static class Base64Url
         }
 
         return totalBytesWritten;
+    }
+
+
+    /// <summary>
+    /// Decodes the sequence of binary data into UTF-8 encoded text represented as base64url.
+    /// </summary>
+    /// <param name="sequence">The input sequence that contains UTF-8 encoded text in base64url that needs to be decoded.</param>
+    /// <param name="bytes">Destination for the decoded base64url binary data.</param>
+    /// <param name="bytesWritten">When this method returns, contains a value that indicates the number of bytes written to <paramref name="bytes"/>.</param>
+    /// <returns><c>true</c> if the operation succeeded; otherwise, <c>false</c> if the destination is too small.</returns>
+    public static bool TryDecode(ReadOnlySequence<char> sequence, Span<byte> bytes, out int bytesWritten)
+    {
+        var charCount = (int)sequence.Length;
+        if (charCount == 0)
+        {
+            bytesWritten = 0;
+            return true;
+        }
+
+        var minDestLength = GetByteCountForDecode(charCount, out _);
+        if (bytes.Length < minDestLength)
+        {
+            bytesWritten = 0;
+            return false;
+        }
+
+        Span<char> scratch = stackalloc char[CharBlockSize];
+        var scratchPos = 0;
+
+        var totalBytesWritten = 0;
+        foreach (var segment in sequence)
+        {
+            var span = segment.Span;
+            var spanLen = span.Length;
+            if (scratchPos > 0)
+            {
+                var need = CharBlockSize - scratchPos;
+                if (need <= spanLen)
+                {
+                    span[..need].CopyTo(scratch[scratchPos..]);
+                    var result = TryDecode(scratch, bytes, ByteBlockSize, remainder: 0, out var localBytesWritten);
+                    Debug.Assert(result && localBytesWritten == ByteBlockSize);
+
+                    bytes = bytes[localBytesWritten..];
+                    totalBytesWritten += localBytesWritten;
+
+                    span = span[need..];
+                    spanLen = span.Length;
+
+                    scratchPos = 0;
+                }
+                else
+                {
+                    span.CopyTo(scratch[scratchPos..]);
+                    scratchPos += spanLen;
+
+                    span = Span<char>.Empty;
+                    spanLen = 0;
+                }
+            }
+
+            if (spanLen == 0)
+                continue;
+
+            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, CharBlockSize);
+            if (spanRemainder == 0)
+            {
+                var result = TryDecode(span, bytes, out var localBytesWritten);
+                Debug.Assert(result);
+
+                bytes = bytes[localBytesWritten..];
+                totalBytesWritten += localBytesWritten;
+            }
+            else
+            {
+                var wholeLen = spanQuotient * CharBlockSize;
+                var result = TryDecode(span[..wholeLen], bytes, out var localBytesWritten);
+                Debug.Assert(result);
+
+                bytes = bytes[localBytesWritten..];
+                totalBytesWritten += localBytesWritten;
+
+                span[wholeLen..].CopyTo(scratch[scratchPos..]);
+                scratchPos += spanRemainder;
+            }
+        }
+
+        if (scratchPos > 0)
+        {
+            var result = TryDecode(scratch[..scratchPos], bytes, out var localBytesWritten);
+            Debug.Assert(result);
+
+            totalBytesWritten += localBytesWritten;
+        }
+
+        bytesWritten = totalBytesWritten;
+        return true;
     }
 
     /// <summary>

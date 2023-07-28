@@ -122,6 +122,12 @@ public class Base64UrlTests
         Assert.Equal(expected.Length, charsWritten);
         Assert.Equal(expected.Length, outBuffer.Length);
         Assert.Equal(expected, outBuffer.AsReadOnlySequence.ToString());
+
+        Span<char> outChars = new char[expected.Length + 1];
+        var result = Base64Url.TryEncode(inBuffer, outChars, out charsWritten);
+        Assert.True(result);
+        Assert.Equal(expected.Length, charsWritten);
+        Assert.Equal(expected, outChars[..charsWritten].ToString());
     }
 
     [Fact]
@@ -277,6 +283,12 @@ public class Base64UrlTests
         Assert.Equal(totalByteCount, bytesWritten);
         Assert.Equal(totalByteCount, outBuffer.Length);
         Assert.Equal(totalByteBuffer.ToArray(), outBuffer.AsReadOnlySequence.ToArray());
+
+        Span<byte> outBytes = new byte[totalByteCount + 1];
+        var result = Base64Url.TryDecode(inBuffer, outBytes, out bytesWritten);
+        Assert.True(result);
+        Assert.Equal(totalByteCount, bytesWritten);
+        Assert.Equal(totalByteBuffer.ToArray(), outBytes[..bytesWritten].ToArray());
     }
 
     [Fact]
