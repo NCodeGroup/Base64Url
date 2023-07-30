@@ -75,3 +75,4 @@ public static class Base64Url
 * v1.0.0 - Initial release
 * v1.1.0 - Added support for sequences
 * v1.1.1 - Added support for sequences without buffer writer
+* v1.1.2 - Added optimization for single segment sequences

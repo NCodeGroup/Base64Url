@@ -143,6 +143,9 @@ public static class Base64Url
         if (sequence.Length == 0)
             return 0;
 
+        if (sequence.IsSingleSegment)
+            return Encode(sequence.FirstSpan, writer);
+
         Span<byte> scratch = stackalloc byte[ByteBlockSize];
         var scratchPos = 0;
 
@@ -222,6 +225,9 @@ public static class Base64Url
             charsWritten = 0;
             return false;
         }
+
+        if (sequence.IsSingleSegment)
+            return TryEncode(sequence.FirstSpan, chars, out charsWritten);
 
         Span<byte> scratch = stackalloc byte[ByteBlockSize];
         var scratchPos = 0;
@@ -443,6 +449,9 @@ public static class Base64Url
         if (sequence.Length == 0)
             return 0;
 
+        if (sequence.IsSingleSegment)
+            return Decode(sequence.FirstSpan, writer);
+
         Span<char> scratch = stackalloc char[CharBlockSize];
         var scratchPos = 0;
 
@@ -523,6 +532,9 @@ public static class Base64Url
             bytesWritten = 0;
             return false;
         }
+
+        if (sequence.IsSingleSegment)
+            return TryDecode(sequence.FirstSpan, bytes, out bytesWritten);
 
         Span<char> scratch = stackalloc char[CharBlockSize];
         var scratchPos = 0;
