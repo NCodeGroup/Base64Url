@@ -21,12 +21,14 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace NCode.Encoders;
 
 /// <summary>
 /// Converts between binary data and UTF-8 encoded text that is represented in base64url (RFC 4648).
 /// </summary>
+[PublicAPI]
 public static class Base64Url
 {
     private const int MaxPadCount = 2;
@@ -42,8 +44,8 @@ public static class Base64Url
         {
             const sbyte __ = -1;
 
-            return new sbyte[]
-            {
+            return
+            [
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
                 __, __, __, __, __, __, __, __, __, __, __, __, __, 62, __, __,
@@ -59,20 +61,11 @@ public static class Base64Url
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
+                __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
+                __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
                 __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __
-            };
+            ];
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static (int Quotient, int Remainder) MathDivRem(int left, int right)
-    {
-#if NET6_0
-        return Math.DivRem(left, right);
-#else
-        var quotient = left / right;
-        return (quotient, left - (quotient * right));
-#endif
     }
 
     /// <summary>
@@ -110,6 +103,29 @@ public static class Base64Url
                 }
             });
         }
+    }
+
+    /// <summary>
+    /// Encodes the sequence of binary data into UTF-8 encoded text represented as base64url.
+    /// </summary>
+    /// <param name="sequence">The input sequence that contains the binary data that needs to be encoded.</param>
+    /// <returns>The string representation of the binary data in base64url format.</returns>
+    public static string Encode(ReadOnlySequence<byte> sequence)
+    {
+        if (sequence.Length == 0)
+            return string.Empty;
+
+        if (sequence.IsSingleSegment)
+            return Encode(sequence.FirstSpan);
+
+        var byteCount = (int)sequence.Length;
+        var charCount = GetCharCountForEncode(byteCount);
+
+        return string.Create(charCount, sequence, static (chars, seq) =>
+        {
+            var result = TryEncode(seq, chars, out var charsWritten);
+            Debug.Assert(result && charsWritten == chars.Length);
+        });
     }
 
     /// <summary>
@@ -180,7 +196,7 @@ public static class Base64Url
             if (spanLen == 0)
                 continue;
 
-            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, ByteBlockSize);
+            var (spanQuotient, spanRemainder) = Math.DivRem(spanLen, ByteBlockSize);
             if (spanRemainder == 0)
             {
                 totalCharsWritten += Encode(span, writer);
@@ -267,7 +283,7 @@ public static class Base64Url
             if (spanLen == 0)
                 continue;
 
-            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, ByteBlockSize);
+            var (spanQuotient, spanRemainder) = Math.DivRem(spanLen, ByteBlockSize);
             if (spanRemainder == 0)
             {
                 var result = TryEncode(span, chars, out var localCharsWritten);
@@ -392,7 +408,7 @@ public static class Base64Url
             return 0;
         }
 
-        var (byteCount, tempRemainder) = MathDivRem(charCount * ByteBlockSize, CharBlockSize);
+        var (byteCount, tempRemainder) = Math.DivRem(charCount * ByteBlockSize, CharBlockSize);
         if (tempRemainder > MaxPadCount)
             throw new FormatException("Invalid length for a Base64Url char array or string.");
 
@@ -408,7 +424,7 @@ public static class Base64Url
     public static byte[] Decode(ReadOnlySpan<char> chars)
     {
         if (chars.Length == 0)
-            return Array.Empty<byte>();
+            return [];
 
         var minDestLength = GetByteCountForDecode(chars.Length, out var remainder);
 
@@ -486,7 +502,7 @@ public static class Base64Url
             if (spanLen == 0)
                 continue;
 
-            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, CharBlockSize);
+            var (spanQuotient, spanRemainder) = Math.DivRem(spanLen, CharBlockSize);
             if (spanRemainder == 0)
             {
                 totalBytesWritten += Decode(span, writer);
@@ -574,7 +590,7 @@ public static class Base64Url
             if (spanLen == 0)
                 continue;
 
-            var (spanQuotient, spanRemainder) = MathDivRem(spanLen, CharBlockSize);
+            var (spanQuotient, spanRemainder) = Math.DivRem(spanLen, CharBlockSize);
             if (spanRemainder == 0)
             {
                 var result = TryDecode(span, bytes, out var localBytesWritten);
@@ -634,7 +650,8 @@ public static class Base64Url
         Span<byte> bytes,
         int minDestLength,
         int remainder,
-        out int bytesWritten)
+        out int bytesWritten
+    )
     {
         var destLength = bytes.Length;
         if (destLength < minDestLength)

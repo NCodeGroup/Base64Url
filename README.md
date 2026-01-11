@@ -19,54 +19,66 @@ public static class Base64Url
     // Encode...
 
     public static int GetCharCountForEncode(
-        int byteCount);
+        int byteCount
+    );
 
     public static string Encode(
-        ReadOnlySpan<byte> bytes);
+        ReadOnlySpan<byte> bytes
+    );
 
     public static int Encode(
         ReadOnlySpan<byte> bytes,
-        IBufferWriter<char> writer);
+        IBufferWriter<char> writer
+    );
 
     public static int Encode(
         ReadOnlySequence<byte> sequence,
-        IBufferWriter<char> writer);
+        IBufferWriter<char> writer
+    );
 
     public static bool TryEncode(
         ReadOnlySequence<byte> sequence,
         Span<char> chars,
-        out int charsWritten);
+        out int charsWritten
+    );
 
     public static bool TryEncode(
         ReadOnlySpan<byte> bytes,
         Span<char> chars,
-        out int charsWritten);
+        out int charsWritten
+    );
 
     // Decode...
 
     public static int GetByteCountForDecode(
-        int charCount);
+        int charCount
+    );
 
     public static byte[] Decode(
-        ReadOnlySpan<char> chars);
+        ReadOnlySpan<char> chars
+    );
 
     public static int Decode(
         ReadOnlySpan<char> chars,
-        IBufferWriter<byte> writer);
+        IBufferWriter<byte> writer
+    );
 
     public static int Decode(
         ReadOnlySequence<char> sequence,
-        IBufferWriter<byte> writer);
+        IBufferWriter<byte> writer
+    );
 
     public static bool TryDecode(
         ReadOnlySequence<char> sequence,
         Span<byte> bytes,
-        out int bytesWritten);
+        out int bytesWritten
+    );
 
     public static bool TryDecode(
         ReadOnlySpan<char> chars,
         Span<byte> bytes,
-        out int bytesWritten);
+        out int bytesWritten
+    );
 }
 ```
 
@@ -76,3 +88,4 @@ public static class Base64Url
 * v1.1.0 - Added support for sequences
 * v1.1.1 - Added support for sequences without buffer writer
 * v1.1.2 - Added optimization for single segment sequences
+* v2.0.0 - Targeting .NET 8.0 and above only
