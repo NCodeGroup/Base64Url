@@ -2,8 +2,8 @@
 <Project>
 
   <PropertyGroup>
-    <Description>This library provides methods for encoding and decoding base64url (RFC 4648) data using the new memory efficient Span and Buffer APIs.</Description>
-    <PackageTags>Base64;Base64Url;RFC4648</PackageTags>
+    <Description>A high-performance .NET library for encoding and decoding base64url data as defined in RFC 4648 Section 5. Built with modern memory-efficient APIs including Span, ReadOnlySequence, and IBufferWriter. Features URL-safe encoding, zero-allocation options, streaming support, and buffer writer integration.</Description>
+    <PackageTags>Base64;Base64Url;RFC4648;Span;ReadOnlySequence;IBufferWriter;Encoding;Decoding;HighPerformance;ZeroAllocation</PackageTags>
   </PropertyGroup>
 
 </Project>
