@@ -1,4 +1,5 @@
 [![ci](https://github.com/NCodeGroup/Base64Url/actions/workflows/main.yml/badge.svg)](https://github.com/NCodeGroup/Base64Url/actions)
+[![Nuget](https://img.shields.io/nuget/v/NCode.Base64Url.svg)](https://www.nuget.org/packages/NCode.Base64Url/)
 
 # NCode.Base64Url
 
