@@ -8,6 +8,8 @@ This file belongs to the project: template updates never change it. Keep it unde
 
 - @.github/instructions/project-template.instructions.md — the plan-then-execute workflow and base conventions, from the project template. Template updates replace it; never edit it. To change one of its rules, override it below or in a listed file.
 - `.github/instructions/csharp.instructions.md` — C# conventions, from the project template; read it before editing `.cs` files.
+- `.github/instructions/csharp-tests.instructions.md` — C# test conventions, from the project template; read it too before editing a test project's `.cs` files.
+- `docs/decisions/` — this project's architecture decision records, and in `project-template/` the template's; read the ones a change touches before deciding otherwise.
 - Project instruction files: add one line for each, `@<path> — what it covers`.
 
 ## Commands
@@ -16,6 +18,7 @@ Run from the repository root in PowerShell 7.
 
 - Build: `dotnet build`
 - Test: `dotnet test`
+- Definition of Done: `./build/dod.ps1` (the full gate CI runs) or `./build/dod.ps1 -Fast` (Debug, no pack); it ends with `Definition of Done: PASSED`. Record a public API change with `./build/Update-PublicApi.ps1`
 
 ## Landing
 
@@ -27,9 +30,12 @@ How `/ship-plan` lands a reviewed plan. `integrate`: `pull-request` pushes the p
 - draft: no
 - follow-ups: issues
 - follow-up-label: follow-up
-- gate: none
+- gate: ./build/dod.ps1 -Fast
 - protect: none
 - pr-format: none
+- review-bots: ncode-review
+- max-review-rounds: 3
+- prelude: none
 
 ## Conventions
 
