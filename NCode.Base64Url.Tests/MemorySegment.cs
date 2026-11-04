@@ -24,7 +24,7 @@ namespace NCode.Encoders.Tests;
 /// <summary>
 /// Provides an implementation of <see cref="ReadOnlySequenceSegment{T}"/> using a linked list of <see cref="ReadOnlyMemory{T}"/> nodes.
 /// </summary>
-internal class MemorySegment<T> : ReadOnlySequenceSegment<T>
+internal sealed class MemorySegment<T> : ReadOnlySequenceSegment<T>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="MemorySegment{T}"/> class.
