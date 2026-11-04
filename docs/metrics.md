@@ -30,10 +30,14 @@ Built-in instruments and spans of .NET and ASP.NET Core are not listed unless th
 
 ## Meters and Instruments
 
+NCode.Base64Url defines no meters or instruments yet.
+
 | Name | Type | Unit | Attributes and their values | Owner |
 | --- | --- | --- | --- | --- |
 
 ## Activity Sources and Spans
+
+NCode.Base64Url defines no activity sources or spans yet.
 
 | Activity source | Span | Mirrors histogram | Attributes and their values | Owner |
 | --- | --- | --- | --- | --- |
