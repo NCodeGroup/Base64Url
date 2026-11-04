@@ -1,0 +1,15 @@
+#nullable enable
+NCode.Encoders.Base64Url
+static NCode.Encoders.Base64Url.Decode(System.Buffers.ReadOnlySequence<char> sequence, System.Buffers.IBufferWriter<byte>! writer) -> int
+static NCode.Encoders.Base64Url.Decode(System.ReadOnlySpan<char> chars, System.Buffers.IBufferWriter<byte>! writer) -> int
+static NCode.Encoders.Base64Url.Decode(System.ReadOnlySpan<char> chars) -> byte[]!
+static NCode.Encoders.Base64Url.Encode(System.Buffers.ReadOnlySequence<byte> sequence, System.Buffers.IBufferWriter<char>! writer) -> int
+static NCode.Encoders.Base64Url.Encode(System.Buffers.ReadOnlySequence<byte> sequence) -> string!
+static NCode.Encoders.Base64Url.Encode(System.ReadOnlySpan<byte> bytes, System.Buffers.IBufferWriter<char>! writer) -> int
+static NCode.Encoders.Base64Url.Encode(System.ReadOnlySpan<byte> bytes) -> string!
+static NCode.Encoders.Base64Url.GetByteCountForDecode(int charCount) -> int
+static NCode.Encoders.Base64Url.GetCharCountForEncode(int byteCount) -> int
+static NCode.Encoders.Base64Url.TryDecode(System.Buffers.ReadOnlySequence<char> sequence, System.Span<byte> bytes, out int bytesWritten) -> bool
+static NCode.Encoders.Base64Url.TryDecode(System.ReadOnlySpan<char> chars, System.Span<byte> bytes, out int bytesWritten) -> bool
+static NCode.Encoders.Base64Url.TryEncode(System.Buffers.ReadOnlySequence<byte> sequence, System.Span<char> chars, out int charsWritten) -> bool
+static NCode.Encoders.Base64Url.TryEncode(System.ReadOnlySpan<byte> bytes, System.Span<char> chars, out int charsWritten) -> bool
